@@ -15,11 +15,7 @@ and it will be able to return a summary of data.
 Run this command to set up  
 and run the container and create the database.
 
-```docker run mysql_library my-mysql \```  
-```-e  MYSQL_ROOT_PASSWORD=root \```  
-```-e MYSQL_DATABASE=library_db \```  
-```-p 3306:3306 \```  
-```mysql:latest```
+```docker run -d --name mysql_library -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=library_db -p 3306:3306 mysql:latest```
 ##
 
 ## Folder structure

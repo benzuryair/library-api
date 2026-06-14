@@ -98,7 +98,7 @@ class SqlBooks:
         cursor.close()
         conn.close()
 
-        return row["total_books"]
+        return row
 
     @staticmethod
     def count_available_books():
@@ -113,7 +113,7 @@ class SqlBooks:
         cursor.close()
         conn.close()
 
-        return row["available_books"]
+        return row
 
     @staticmethod
     def count_borrowed_books():
@@ -128,7 +128,7 @@ class SqlBooks:
         cursor.close()
         conn.close()
 
-        return row["borrowed_books"]
+        return row
 
     @staticmethod
     def count_by_genre(genre: str):
@@ -144,7 +144,7 @@ class SqlBooks:
         cursor.close()
         conn.close()
 
-        return row["sum_count_by_genre"]
+        return {"Genre": genre, "COUNT": row["sum_count_by_genre"]}
 
     @staticmethod
     def count_active_borrows_by_member(member_id: int):

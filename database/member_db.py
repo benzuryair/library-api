@@ -9,7 +9,7 @@ class SqlMember:
         conn = db_connection.get_connection()
         cursor = conn.cursor()
 
-        sql = "insert into membrs(name, email) values(%s, %s)"
+        sql = "insert into members(name, email) values(%s, %s)"
 
         values = list(data.values())
         logging.info("The system was asked to create a new member for the library.")
@@ -32,11 +32,10 @@ class SqlMember:
         sql = "select * from members"
 
         cursor.execute(sql)
+        rows = cursor.fetchall()
 
         cursor.close()
         conn.close()
-
-        rows = cursor.fetchall()
 
         return rows
 
@@ -84,7 +83,9 @@ class SqlMember:
     def deactivate_member(id: int):
         conn = db_connection.get_connection()
         cursor = conn.cursor()
-
+        member = SqlMember.get_member_by_id(id)
+        if member is None:
+            return False
         logging.info("The system was asked to deactivate a library member.")
         sql = "update members set is_active = False where id = %s"
 
@@ -102,7 +103,9 @@ class SqlMember:
     def activate_member(id: int):
         conn = db_connection.get_connection()
         cursor = conn.cursor()
-
+        member = SqlMember.get_member_by_id(id)
+        if member is None:
+            return False
         logging.info("The system was asked to activate a library member.")
         sql = "update members set is_active = True where id = %s"
 
@@ -148,14 +151,14 @@ class SqlMember:
         cursor.close()
         conn.close()
 
-        return row["active_members"]
+        return row
 
     @staticmethod
     def get_top_member():
         conn = db_connection.get_connection()
         cursor = conn.cursor(dictionary=True)
 
-        sql = "SELECT MAX(total_borrows) as top_member from members "
+        sql = "SELECT id, total_borrows from members order by total_borrows desc limit 1 "
 
         cursor.execute(sql)
 
@@ -164,4 +167,4 @@ class SqlMember:
         cursor.close()
         conn.close()
 
-        return row["top_member"]
+        return row

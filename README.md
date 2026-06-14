@@ -112,6 +112,7 @@ GET | /members/{id} | Member by ID|
 | :----| :----------| :---------|  
 |GET| /reports/summary| General report|  
 |GET | /reports/top-member| The most active member|
+|GET | /reports/books-by-genre | Books by genre|
 
 ##
 # System flow  

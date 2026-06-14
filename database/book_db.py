@@ -5,15 +5,13 @@ import logging
 class SqlBooks:
 
     @staticmethod
-    def create_book(data):
+    def create_book(data: dict):
         conn = db_connection.get_connection()
         cursor = conn.cursor()
 
-        sql = """INSERT INTO books (title, author, genre, is_available) VALUES (%s, %s, %s, %s);"""
+        sql = """INSERT INTO books (title, author, genre) VALUES (%s, %s, %s);"""
         logging.info("The system was asked to add a book.")
-        cursor.execute(
-            sql, (data["title"], data["author"], data["genre"], data["is_available"])
-        )
+        cursor.execute(sql, (data["title"], data["author"], data["genre"]))
         new_id = cursor.lastrowid
         conn.commit()
         cursor.close()
@@ -34,7 +32,7 @@ class SqlBooks:
         return all_rows
 
     @staticmethod
-    def get_book_by_id(id):
+    def get_book_by_id(id: int):
         conn = db_connection.get_connection()
         cursor = conn.cursor(dictionary=True)
 
@@ -49,7 +47,7 @@ class SqlBooks:
         return one_line
 
     @staticmethod
-    def update_book(id, data):
+    def update_book(id: int, data: dict):
         conn = db_connection.get_connection()
         cursor = conn.cursor()
 
@@ -69,7 +67,7 @@ class SqlBooks:
         return changed
 
     @staticmethod
-    def set_available(id, val, member_id):
+    def set_available(id: int, val: bool, member_id: int):
         conn = db_connection.get_connection()
         cursor = conn.cursor()
 
@@ -133,7 +131,7 @@ class SqlBooks:
         return row["borrowed_books"]
 
     @staticmethod
-    def count_by_genre(genre):
+    def count_by_genre(genre: str):
         conn = db_connection.get_connection()
         cursor = conn.cursor(dictionary=True)
 
@@ -149,7 +147,7 @@ class SqlBooks:
         return row["sum_count_by_genre"]
 
     @staticmethod
-    def count_active_borrows_by_member(member_id):
+    def count_active_borrows_by_member(member_id: int):
         conn = db_connection.get_connection()
         cursor = conn.cursor(dictionary=True)
 

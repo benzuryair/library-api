@@ -8,13 +8,13 @@ from typing import Literal
 router = APIRouter()
 
 
-class book(BaseModel):
+class Book(BaseModel):
     title: str = Field(max_length=50)
     author: str = Field(max_length=50)
     genre: Literal["Fiction", "Non-Fiction", "Science", "History", "Other"]
 
 
-class updatedbook(BaseModel):
+class UpdatedBook(BaseModel):
     title: str | None = Field(max_length=50, default=None)
     author: str | None = Field(max_length=50, default=None)
     genre: Literal["Fiction", "Non-Fiction", "Science", "History", "Other"] | None = (
@@ -23,12 +23,12 @@ class updatedbook(BaseModel):
 
 
 @router.post("", status_code=201)
-def router_create_book(body: book):
+def router_create_book(body: Book):
     logging.info("The system received an HTTP request to add a book.")
     body = body.model_dump()
     new_id = SqlBooks.create_book(body)
     logging.info(f"Book with ID: {new_id} successfully added to the system")
-    return {"massage": f"Book with ID: {new_id} successfully added to the system"}
+    return {"message": f"Book with ID: {new_id} successfully added to the system"}
 
 
 @router.get("")
@@ -52,16 +52,16 @@ def router_get_book_by_id(id: int):
 
 
 @router.patch("/{id}")
-def router_update_book(id: int, body: updatedbook):
+def router_update_book(id: int, body: UpdatedBook):
     logging.info("HTTP request to update details of one book")
     body = body.model_dump(exclude_none=True)
     changed = SqlBooks.update_book(id, body)
     if changed:
         logging.info(f"Book ID:{id} updated successfully")
-        return {"massage": f"Book ID:{id} updated successfully"}
+        return {"message": f"Book ID:{id} updated successfully"}
     else:
         logging.error("No book with such ID was found.")
-        return {"massage": "No book with such ID was found."}
+        return {"message": "No book with such ID was found."}
 
 
 @router.patch("/{id}/borrow/{member_id}")
@@ -81,7 +81,8 @@ def router_borrow_book(id: int, member_id: int):
         logging.error("The member is inactive.")
         raise HTTPException(status_code=400, detail="The member is inactive.")
 
-    if member_dict["total_borrows"] >= 3:
+    active_borrows = SqlBooks.count_active_borrows_by_member(member_id)
+    if active_borrows >= 3:
         logging.error(
             "You cannot lend to a customer because he has already borrowed 3 books."
         )
@@ -105,7 +106,7 @@ def router_borrow_book(id: int, member_id: int):
     SqlMember.increment_borrows(member_id)
     logging.info("The system successfully lent the book to the friend.")
     return {
-        "massage": f"Book ID:{id} was successfully loaned to library member ID:{member_id}"
+        "message": f"Book ID:{id} was successfully loaned to library member ID:{member_id}"
     }
 
 
@@ -131,7 +132,7 @@ def router_return_book(id: int, member_id: int):
             status_code=400,
             detail="The book cannot be returned because it is not borrowed.",
         )
-    if book["borrowed_by_member_id"] != member_id:
+    if book_dict["borrowed_by_member_id"] != member_id:
         logging.error(
             "Cannot be returned because the book was not lent to the friend who is trying to return it."
         )
@@ -141,4 +142,4 @@ def router_return_book(id: int, member_id: int):
         )
     SqlBooks.set_available(id, True, None)
     logging.info("The system successfully returned the book to the library.")
-    return {"massage": f"The system successfully returned the book id:{id} to the library."}
+    return {"message": f"The system successfully returned the book id:{id} to the library."}

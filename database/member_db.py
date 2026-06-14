@@ -9,7 +9,7 @@ class SqlMember:
         conn = db_connection.get_connection()
         cursor = conn.cursor()
 
-        sql = "insert into membrs(name, email, is_active, total_borrows) values(%s, %s, %s, %s)"
+        sql = "insert into membrs(name, email) values(%s, %s)"
 
         values = list(data.values())
         logging.info("The system was asked to create a new member for the library.")
